@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>PUJ Fare Guide</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Mapbox -->
+    <link href="mapbox/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="mapbox/mapbox-gl-directions.css" />
+    <script src="mapbox/mapbox-gl.js"></script>
+    <script src="mapbox/mapbox-gl-directions.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    
+    <style>
+        @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden !important;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+        }   
+
+        #map {
+            z-index: 1;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .container {
+            display: none;
+            align-items: center;
+            z-index: 2;
+            position: absolute;
+            background-color: white;
+            border-radius: 20px;
+            top: 70%;
+            left: 15%;
+            width: 70%;
+            height: 10vw;
+            line-height: .9;
+            animation-name: animationUp;
+            animation-duration: 0.5s;
+            color: #454952;
+            box-shadow: 0px 0px 10px rgba(209, 209, 209, 0.5);
+        }
+
+        .discountedNote {
+            font-size: .7vw;
+        }
+
+        .mobileClose {
+            display: none;
+        }
+
+        .kilometerLabel,
+        .normalFareLabel,
+        .discountedFareLabel {
+            padding: 0px 2vw;
+            font-size: 1.2vw;
+
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .kilometer,
+        .normalFare,
+        .discountedFare {
+            font-size: 3.5vw;
+            
+        }
+
+        .discountedFareLabel {
+            padding-top: .4vw;
+        }
+        
+        .kilometerLabel {
+            background-color: #003C6F;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+            color: white;
+
+            margin: 0 2.1vw;
+        }
+
+        .normalFareLabel,
+        .discountedFareLabel {
+            margin: 0 0 0 1.1vw;
+        }
+
+        .directions-icon-reverse,
+        .directions-reverse,
+        .mapboxgl-ctrl-attrib-inner,
+        .mapbox-directions-profile,
+        .mapboxgl-ctrl-icon {
+            display: none;
+        }
+
+        .onClose {
+            animation-name: animationDown;
+            animation-duration: 0.5s;
+            transform: translateY(150%);
+        }
+
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 20px;
+            font-size: 19px;
+
+        }
+
+        .mapbox-directions-origin input  {
+            border-radius: 0px 10px 0px 0px; 
+        }
+
+        .mapbox-directions-destination input  {
+            border-radius: 0px 0px 10px 0px; 
+        }
+
+        .mapboxgl-ctrl-geocoder input {
+            background-color: #f0f0f0 !important;
+            border: solid 0px white !important;
+            font-size: 14px !important;
+            font-family: 'Poppins', sans-serif;
+            height: 35px!important;  
+        }
+
+        .geocoder-pin-right button, .geocoder-pin-right span {
+            margin-top: -3px;
+        }
+
+        .geocoder-pin-right button:hover {
+        background-color: transparent!important;
+        }
+
+        .mapboxgl-ctrl-geocoder ul {
+            font-size: 14px !important;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .mapbox-directions-destination {
+            margin-top: 3px;
+        }
+
+        .mapboxgl-ctrl-geolocate {
+            background: #1A3B70 !important;
+            top: 100;
+            position: relative;
+            margin-top: -87px;
+            margin-left: 20px;
+        }
+
+        .location {
+            position: absolute;
+            z-index: 9;
+            font-size: 17px;
+            margin-top: 60px;
+            margin-left: 38px;
+            color: white;
+        }
+
+        .mapbox-directions-component-keyline {
+            background-color:white;
+            border-radius: 10px;
+            padding: 7px 13px 7px 30px;
+            position: relative;
+            margin-left: -15px;
+            box-shadow: 0px 0px 10px rgba(209, 209, 209, 0.5);
+        }
+
+        .mapbox-directions-destination .mapbox-form-label, .mapbox-directions-origin .mapbox-form-label{
+            height: 35px!important;
+        }
+
+        @keyframes animationUp {
+            from {
+                transform: translateY(150%);
+                opacity: 0
+            }
+            to {
+                transform: translateY(0%);
+                opacity: 1
+            }
+        }
+
+        @keyframes animationDown {
+            from {
+                transform: translateY(0%);
+                opacity: 1
+            }
+            to {
+                transform: translateY(150%);
+                opacity: 0
+            }
+        }
+
+        /* Tablet */
+        @media (max-width: 992px) {
+            .container {
+                top: 78%;
+                width: 73%;
+            }
+
+            .discountedNote {
+                font-size: .8vw;
+            }
+
+            .kilometerLabel,
+            .normalFareLabel,
+            .discountedFareLabel {
+                font-size: 1.4vw;
+            }
+
+            .discountedFareLabel {
+                padding-top: .4vw;
+            }
+
+            .kilometer,
+            .normalFare,
+            .discountedFare {
+                font-size: 4vw;
+            }
+
+            .close {
+                position: absolute;
+                right: 15px;
+                top: 10px;
+                font-size: 17px;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 576px) {
+            .container {
+                width: 100%;
+                height: 13%;
+                top: 87%;
+                left: 0;
+                justify-content: center;
+                z-index: 2;
+                position: absolute;
+                border-radius: 20px 20px 0px 0px;
+            }
+
+            .kilometerLabel {
+                display: none;
+                color: #454952;
+                background-color: white;
+            }
+
+            .normalFareLabel {
+                background-color: #003C6F;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                color: white;
+            }
+
+            .normalFareLabel,
+            .discountedFareLabel {
+                padding: 0px 3vw;
+            }
+
+            .discountedNote {
+                font-size: 1.4vw;
+            }
+
+            .close {
+                font-size: 16px;
+                right: 15px;
+                top: 10px;
+            }
+
+            .kilometerLabel,
+            .normalFareLabel,
+            .discountedFareLabel {
+                font-size: 2.5vw;
+            }
+
+            .kilometer,
+            .normalFare,
+            .discountedFare {
+                font-size: 7.3vw;
+            }
+
+            .discountedFareLabel {
+                padding-top: 1vw;
+            }
+
+            .mapboxgl-ctrl-group .mapboxgl-ctrl-zoom-in,
+            .mapboxgl-ctrl-group .mapboxgl-ctrl-zoom-out {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="" id="map">
+    </div>
+    <div class="location"><i class="fas fa-map-marker-alt"></i></div>
+    <div class="container">
+        <div class="pad kilometerLabel">Kilometer
+            <div class="kilometer">00 KM</div>
+        </div>
+        <div class="pad normalFareLabel">Regular Fare
+            <div class="normalFare">00.00 PHP</div>
+        </div>
+        <div class="pad discountedFareLabel">Discounted Fare
+            <div class="discountedFare">00.00 PHP</div>
+            <div class="discountedNote">for Elderly/Student/PWD</div>
+        </div>
+        <div class="close"><i class="fas fa-times"></i></div>
+    </div>
+
+    <script>
+        let kilometerText = document.querySelector(".kilometer");
+        let kilometerLabel = document.querySelector(".kilometerLabel");
+        let normalFareText = document.querySelector(".normalFare");
+        let discountedFareText = document.querySelector(".discountedFare");
+        let normalFareLabel = document.querySelector(".normalFareLabel");
+        let discountedFareLabel = document.querySelector(".discountedFareLabel");
+        let container = document.querySelector(".container"); 
+
+        fetch("data.json")
+            .then((response) => response.json())
+            .then((data) => {
+                mapboxgl.accessToken = data.key;
+                const directions = new MapboxDirections({
+                    accessToken: mapboxgl.accessToken,
+                    steps: false,
+                    geometries: 'polyline',
+                    /* country: 'PH', */
+                    controls: {
+                        instructions: false,
+                    }
+                });
+
+                const navigation = new mapboxgl.NavigationControl({
+                    showCompass: false,
+                    showZoom: true
+                });
+
+                const location = new mapboxgl.GeolocateControl({
+                    positionOptions: {
+                        enableHighAccuracy: true
+                    },
+                    trackUserLocation: true,
+                    showUserHeading: true
+                });
+
+                const map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/nydigorith/ckw3mdv960ft514pqy0sydxv8',
+                    center: [121.025, 14.6],
+                    maxBounds: [
+                        [112.18040199555708, 4.378045585082305],
+                        [132.72033481430617, 20.92928212653746]
+                    ],
+                    zoom: 10
+                });
+
+                map.addControl(directions, 'top-left');
+                map.addControl(navigation, 'top-right');
+                map.addControl(location, 'top-left');
+                map.on('load', () => {
+                    directions.on('route', (event) => {
+
+                        let distance = `${JSON.stringify(event.route[0].distance, null, 2)}`;
+                        let normalFare = data.normalFare;
+                        let discountedFare = data.discountedFare;
+                        let normalAdditionalFare = data.normalAdditionalFare;
+                        let discountedAdditionalFare = data.discountedAdditionalFare;
+                       
+                        //Math.floor();
+                        let kilometer = Math.round(distance / 1000);
+                        let meter = Math.floor(distance);
+
+                        if (kilometer == 0) {
+                            kilometerText.innerHTML =
+                                `${meter} M`;
+                        } else {
+                            kilometerText.innerHTML =
+                                `${kilometer} KM`;
+                        }
+                        
+                        if (window.innerWidth < 577) {
+                            kilometerLabel.style.display = "none";
+                        } else {
+                            kilometerLabel.style.display = "flex";
+                        }
+
+                        if (kilometer < 5) {
+                            normalFareLabel.style.display = "flex";
+                            discountedFareLabel.style.display = "flex";
+
+                            Number.isInteger(normalFare) ?
+                                normalFareText.innerHTML = `${normalFare} PHP` :
+                                normalFareText.innerHTML = `${normalFare.toFixed(2)} PHP`;
+
+                            Number.isInteger(discountedFare) ?
+                                discountedFareText.innerHTML = `${discountedFare} PHP` :
+                                discountedFareText.innerHTML = `${discountedFare.toFixed(2)} PHP`;
+
+                        } else if (kilometer > 50) {
+                            if (window.innerWidth < 577) {
+                                kilometerLabel.style.display = "flex";
+                            }
+                            kilometerText.innerHTML = "Out of Range";
+                            normalFareLabel.style.display = "none";
+                            discountedFareLabel.style.display = "none";
+                        } else {
+                            for (let i = 4; i < kilometer; i++) {
+                                normalFare = normalFare + normalAdditionalFare;
+                                discountedFare = discountedFare + discountedAdditionalFare;
+                            }
+
+                            normalFareLabel.style.display = "flex";
+                            discountedFareLabel.style.display = "flex";
+
+                            let normal = parseFloat((normalFare).toFixed(10));
+                            Number.isInteger(normal) ?
+                                normalFareText.innerHTML = `${normal} PHP` :
+                                normalFareText.innerHTML = `${normal.toFixed(2)} PHP`;
+
+                            let discounted = parseFloat((discountedFare).toFixed(10));
+                            Number.isInteger(discounted) ?
+                                discountedFareText.innerHTML = `${discounted} PHP` :
+                                discountedFareText.innerHTML = `${discounted.toFixed(2) } PHP`;
+                        }
+                        container.classList.remove("onClose");
+                        container.style.display = "flex";
+                    });
+                });
+            });
+
+        document.querySelector(".close").addEventListener("click", () => {
+            container.classList.add("onClose");
+        });
+    </script>
+</body>
+
+</html>
